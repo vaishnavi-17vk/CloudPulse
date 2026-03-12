@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Cell, LineChart, Line, ReferenceLine
+  ResponsiveContainer, Cell, LineChart, Line
 } from 'recharts';
+import StatCard from './ui/StatCard';
+import ChartCard from './ui/ChartCard';
 
 const COMPONENTS = [
-  { key: null,             label: 'GLOBAL INFRA',  color: '#3b82f6' },
-  { key: 'paas_payment',  label: 'PAAS PAYMENT',   color: '#f97316' },
-  { key: 'iaas_webpage',  label: 'IAAS WEBPAGE',   color: '#10b981' },
-  { key: 'saas_database', label: 'SAAS DATABASE',  color: '#8b5cf6' },
+  { key: null,             label: 'GLOBAL INFRA',  color: 'var(--brand-accent)' },
+  { key: 'paas_payment',  label: 'PAAS PAYMENT',   color: 'var(--brand-secondary)' },
+  { key: 'iaas_webpage',  label: 'IAAS WEBPAGE',   color: 'var(--brand-primary)' },
+  { key: 'saas_database', label: 'SAAS DATABASE',  color: 'var(--brand-purple)' },
 ];
 
 const BASELINE_MONTHLY = { paas_payment: 144.00, iaas_webpage: 143.28, saas_database: 216.36 };
@@ -16,12 +18,20 @@ const BASELINE_MONTHLY = { paas_payment: 144.00, iaas_webpage: 143.28, saas_data
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(8px)', border: '1px solid var(--border-dim)', padding: '12px', borderRadius: '8px', minWidth: '160px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}>
-      <div style={{ fontFamily: 'Space Mono', fontSize: '9px', color: 'var(--text-muted)', marginBottom: '8px', textTransform: 'uppercase' }}>{label}</div>
+    <div style={{ 
+      background: 'var(--glass-bg)', 
+      backdropFilter: 'blur(8px)', 
+      border: '1px solid var(--border-dim)', 
+      padding: '12px', 
+      borderRadius: '8px', 
+      minWidth: '160px', 
+      boxShadow: 'var(--shadow-md)' 
+    }}>
+      <div className="meta-text" style={{ marginBottom: '8px', textTransform: 'uppercase', fontWeight: '700' }}>{label}</div>
       {payload.map((p, i) => (
         <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', alignItems: 'center', marginBottom: '4px' }}>
-          <span style={{ fontFamily: 'Outfit', fontSize: '11px', color: 'var(--text-dim)' }}>{p.name}</span>
-          <span style={{ fontFamily: 'Space Mono', fontSize: '12px', fontWeight: '700', color: p.fill || p.color }}>${Number(p.value || 0).toFixed(2)}</span>
+          <span className="body-text" style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{p.name}</span>
+          <span className="mono" style={{ fontSize: '14px', fontWeight: '700', color: p.fill || p.color }}>${Number(p.value || 0).toFixed(2)}</span>
         </div>
       ))}
     </div>
@@ -47,9 +57,9 @@ export default function CostPanel() {
   }, [compIdx]);
 
   const compSummary = [
-    { key: 'paas_payment',  label: 'PaaS Payment',  color: '#f97316' },
-    { key: 'iaas_webpage',  label: 'IaaS Webpage',  color: '#10b981' },
-    { key: 'saas_database', label: 'SaaS Database', color: '#8b5cf6' },
+    { key: 'paas_payment',  label: 'PaaS Payment',  color: 'var(--brand-secondary)' },
+    { key: 'iaas_webpage',  label: 'IaaS Webpage',  color: 'var(--brand-primary)' },
+    { key: 'saas_database', label: 'SaaS Database', color: 'var(--brand-purple)' },
   ].map(c => {
     const baseline = BASELINE_MONTHLY[c.key];
     const savingsPct = c.key === 'paas_payment' ? 65.6 : c.key === 'iaas_webpage' ? 33.8 : 61.5;
@@ -81,27 +91,28 @@ export default function CostPanel() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      {/* Header section */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h2 style={{ fontSize: '24px', fontWeight: '800' }}>Economic Impact Analysis</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '4px' }}>Real-time cost reduction via Integer-PSO tier allocation</p>
+          <h2 className="page-title">Economic Impact Analysis</h2>
+          <p className="body-text" style={{ marginTop: '4px' }}>Direct fiscal optimization via Integer-PSO tier allocation</p>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', background: 'var(--input-bg)', padding: '6px', borderRadius: '12px', border: '1px solid var(--border-dim)' }}>
           {COMPONENTS.map((c, i) => (
             <button key={i} 
               onClick={() => setCompIdx(i)}
               style={{
-                padding: '6px 14px',
-                fontSize: '11px',
+                padding: '10px 18px',
+                fontSize: '13px',
                 fontWeight: '700',
-                fontFamily: 'Space Mono',
-                background: i === compIdx ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
-                border: `1px solid ${i === compIdx ? 'var(--brand-accent)' : 'var(--border-dim)'}`,
-                color: i === compIdx ? 'var(--brand-accent)' : 'var(--text-muted)',
-                borderRadius: '6px',
+                background: i === compIdx ? 'var(--bg-card)' : 'transparent',
+                border: 'none',
+                color: i === compIdx ? 'var(--text-primary)' : 'var(--text-muted)',
+                borderRadius: '8px',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
-                textTransform: 'uppercase'
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                textTransform: 'uppercase',
+                boxShadow: i === compIdx ? 'var(--shadow-sm)' : 'none'
               }}
             >
               {c.label}
@@ -110,67 +121,79 @@ export default function CostPanel() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
-        {[
-          { label: 'Monthly Baseline', value: `$${totalBaseline.toFixed(0)}`, color: 'var(--status-err)', sub: 'STATIC TIER PRICING' },
-          { label: 'Optimized Cost', value: `$${totalOptimized.toFixed(0)}`, color: 'var(--brand-secondary)', sub: 'AI ALLOCATED SPEND' },
-          { label: 'Direct Savings', value: `$${totalSavings.toFixed(0)}`, color: 'var(--brand-primary)', sub: 'RECOVERED CAPITAL' },
-          { label: 'Total Efficiency', value: `${totalSavingsPct}%`, color: 'var(--brand-accent)', sub: 'SYSTEM OVERHEAD REDUCTION', hero: true },
-        ].map(({ label, value, color, sub, hero }) => (
-          <div key={label} className={`premium-card ${hero ? 'glass' : ''}`} style={{ padding: '24px', background: hero ? 'rgba(16, 185, 129, 0.05)' : 'var(--bg-card)' }}>
-             <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>{label}</div>
-             <div style={{ fontSize: '32px', fontWeight: '800', marginTop: '8px', color: hero ? 'var(--brand-secondary)' : color, fontFamily: 'Space Mono' }}>{value}</div>
-             <div style={{ fontSize: '9px', color: 'var(--text-muted)', marginTop: '4px', letterSpacing: '0.05em', fontFamily: 'Space Mono' }}>{sub}</div>
-             {hero && (
-                <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', marginTop: '16px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: value, background: 'var(--brand-secondary)', borderRadius: '2px' }} />
-                </div>
-             )}
-          </div>
-        ))}
+      {/* Summary StatCards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+        <StatCard 
+          label="Monthly Baseline" 
+          value={`$${totalBaseline.toFixed(0)}`} 
+          subValue="LEGACY FIXED TIERS"
+          color="var(--status-err)"
+          icon="📈"
+        />
+        <StatCard 
+          label="Optimized Cost" 
+          value={`$${totalOptimized.toFixed(0)}`} 
+          subValue="DYNAMIC TIER PLACEMENT"
+          color="var(--brand-primary)"
+          icon="📉"
+        />
+        <StatCard 
+          label="Direct Savings" 
+          value={`$${totalSavings.toFixed(0)}`} 
+          subValue="MONTHLY RECOVERED CAPITAL"
+          color="var(--brand-accent)"
+          icon="💰"
+        />
+        <StatCard 
+          label="Efficiency Factor" 
+          value={`${totalSavingsPct}%`} 
+          subValue="SYSTEM-WIDE IMPROVEMENT"
+          color="var(--brand-purple)"
+          icon="🎯"
+        />
       </div>
 
+      {/* Visual Analytics Sections */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '32px' }}>
-        <div className="premium-card" style={{ padding: '32px' }}>
-           <h3 style={{ fontSize: '14px', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: '32px' }}>Allocation Comparison: Baseline vs AI</h3>
-           <div style={{ height: '280px', width: '100%' }}>
+        <ChartCard title="Tier Allocation Strategy: Baseline vs AI">
+           <div style={{ height: '300px', width: '100%', marginTop: '12px' }}>
               <ResponsiveContainer width="100%" height="100%">
-                 <BarChart data={barData} barGap={8}>
-                    <CartesianGrid strokeDasharray="3 6" stroke="var(--border-dim)" vertical={false} opacity={0.3} />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'var(--text-muted)', fontFamily: 'Space Mono' }} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'var(--text-muted)', fontFamily: 'Space Mono' }} tickFormatter={v => `$${v}`} />
-                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.02)' }} />
-                    <Bar dataKey="Baseline" fill="rgba(239, 68, 68, 0.15)" stroke="rgba(239, 68, 68, 0.3)" strokeWidth={1} radius={[4, 4, 0, 0]} />
+                 <BarChart data={barData} barGap={12}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-dim)" vertical={false} opacity={0.4} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 13, fill: 'var(--text-secondary)', fontWeight: '600' }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-muted)', fontFamily: 'Space Mono' }} tickFormatter={v => `$${v}`} />
+                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--bg-card-hover)', opacity: 0.4 }} />
+                    <Bar dataKey="Baseline" fill="var(--status-err)" fillOpacity={0.1} stroke="var(--status-err)" strokeWidth={1} radius={[4, 4, 0, 0]} />
                     <Bar dataKey="Optimized" radius={[4, 4, 0, 0]}>
                       {barData.map((e, i) => (
-                        <Cell key={i} fill={e.color} fillOpacity={0.8} />
+                        <Cell key={i} fill={e.color} fillOpacity={0.85} />
                       ))}
                     </Bar>
                  </BarChart>
               </ResponsiveContainer>
            </div>
-        </div>
+        </ChartCard>
 
-        <div className="premium-card glass" style={{ padding: '32px' }}>
-           <h3 style={{ fontSize: '14px', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: '32px' }}>Portfolio Breakdown</h3>
-           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="premium-card glass" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+           <h3 className="section-title" style={{ fontSize: '16px', color: 'var(--text-primary)', letterSpacing: '0.05em' }}>Portfolio Breakdown</h3>
+           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {compSummary.map(c => (
-                <div key={c.key} style={{ padding: '16px', background: 'var(--bg-main)', borderRadius: '12px', border: '1px solid var(--border-dim)' }}>
+                <div key={c.key} style={{ padding: '20px', background: 'var(--bg-main)', borderRadius: '16px', border: '1px solid var(--border-dim)', transition: 'all 0.2s' }} className="table-row-hover">
                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: '700', fontSize: '13px', color: c.color }}>{c.label.toUpperCase()}</span>
-                      <span style={{ fontSize: '14px', fontWeight: '800', color: 'var(--brand-secondary)' }}>{c.savingsPct}% OFF</span>
+                      <span className="card-title" style={{ fontSize: '14px', color: c.color, textTransform: 'uppercase' }}>{c.label}</span>
+                      <span className="meta-text" style={{ fontWeight: '800', color: 'var(--brand-primary)', background: 'rgba(34, 197, 94, 0.1)', padding: '2px 10px', borderRadius: '12px', fontSize: '11px' }}>{c.savingsPct}% SAVED</span>
                    </div>
-                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '14px' }}>
+                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
                       <div>
-                         <div style={{ fontSize: '9px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Baseline</div>
-                         <div style={{ fontSize: '15px', fontWeight: '700', fontFamily: 'Space Mono' }}>${c.baseline.toFixed(0)}</div>
+                         <div className="meta-text" style={{ fontSize: '11px', textTransform: 'uppercase', fontWeight: '700' }}>Baseline</div>
+                         <div className="mono" style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-secondary)' }}>${c.baseline.toFixed(0)}</div>
                       </div>
                       <div>
-                         <div style={{ fontSize: '9px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Optimized</div>
-                         <div style={{ fontSize: '15px', fontWeight: '700', fontFamily: 'Space Mono', color: 'var(--text-main)' }}>${c.optimized.toFixed(0)}</div>
+                         <div className="meta-text" style={{ fontSize: '11px', textTransform: 'uppercase', fontWeight: '700' }}>Optimized</div>
+                         <div className="mono" style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>${c.optimized.toFixed(0)}</div>
                       </div>
                    </div>
-                   <div style={{ height: '3px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', marginTop: '12px' }}>
+                   <div style={{ height: '4px', background: 'var(--border-dim)', borderRadius: '2px', marginTop: '16px' }}>
                       <div style={{ height: '100%', width: `${c.savingsPct}%`, background: c.color, borderRadius: '2px' }} />
                    </div>
                 </div>
@@ -179,22 +202,19 @@ export default function CostPanel() {
         </div>
       </div>
 
-      <div className="premium-card" style={{ padding: '32px' }}>
-        <h3 style={{ fontSize: '14px', textTransform: 'uppercase', color: 'var(--brand-secondary)', marginBottom: '32px' }}>Projected Fiscal Trajectory (12-Month)</h3>
-        <div style={{ height: '200px' }}>
-           <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={yearData}>
-                 <CartesianGrid strokeDasharray="3 6" stroke="var(--border-dim)" vertical={false} opacity={0.3} />
-                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'var(--text-muted)', fontFamily: 'Space Mono' }} />
-                 <YAxis yAxisId="L" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'var(--text-muted)', fontFamily: 'Space Mono' }} tickFormatter={v => `$${v}`} />
-                 <YAxis yAxisId="R" orientation="right" hide />
-                 <Tooltip content={<CustomTooltip />} />
-                 <Line yAxisId="L" type="monotone" dataKey="savings" stroke="var(--brand-secondary)" strokeWidth={3} dot={{ stroke: 'var(--brand-secondary)', strokeWidth: 2, r: 4, fill: 'var(--bg-main)' }} />
-                 <Line yAxisId="R" type="monotone" dataKey="cumulative" stroke="var(--brand-accent)" strokeWidth={1} strokeDasharray="5 5" dot={false} opacity={0.3} />
-              </LineChart>
-           </ResponsiveContainer>
-        </div>
-      </div>
+      <ChartCard title="Projected Fiscal Trajectory (12-Month)" height="250px">
+         <ResponsiveContainer width="100%" height="100%" style={{ marginTop: '12px' }}>
+            <LineChart data={yearData}>
+               <CartesianGrid strokeDasharray="3 3" stroke="var(--border-dim)" vertical={false} opacity={0.4} />
+               <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 13, fill: 'var(--text-muted)' }} />
+               <YAxis yAxisId="L" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-muted)', fontFamily: 'Space Mono' }} tickFormatter={v => `$${v}`} />
+               <YAxis yAxisId="R" orientation="right" hide />
+               <Tooltip content={<CustomTooltip />} />
+               <Line yAxisId="L" type="monotone" dataKey="savings" stroke="var(--brand-primary)" strokeWidth={3.5} dot={{ stroke: 'var(--brand-primary)', strokeWidth: 2.5, r: 5, fill: 'var(--bg-main)' }} shadow="var(--shadow-md)" />
+               <Line yAxisId="R" type="monotone" dataKey="cumulative" stroke="var(--brand-accent)" strokeWidth={2} strokeDasharray="6 6" dot={false} opacity={0.3} />
+            </LineChart>
+         </ResponsiveContainer>
+      </ChartCard>
     </div>
   );
 }
