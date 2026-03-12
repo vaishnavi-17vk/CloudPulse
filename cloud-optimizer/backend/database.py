@@ -228,7 +228,7 @@ class CloudOptimizerDB:
         """Get cleaned readings. Returns list of dicts ordered by timestamp ASC."""
         with self.get_conn() as conn:
             rows = conn.execute(
-                """SELECT timestamp, raw_value, cleaned_value, was_anomaly
+                """SELECT timestamp, raw_value, cleaned_value, was_anomaly, anomaly_score
                    FROM cleaned_metrics
                    WHERE component = ? AND resource = ?
                    ORDER BY timestamp ASC
@@ -301,14 +301,24 @@ class CloudOptimizerDB:
             )
 
     def get_best_predictions(self, component, resource):
-        """Get predictions from the best model only (is_best=1). Returns list of dicts."""
+        """Get predictions from the latest best-run only. Prevents processing stale runs."""
         with self.get_conn() as conn:
+            # 1. Find the latest run_id for this pair
+            last_run = conn.execute(
+                "SELECT run_id FROM ml_predictions WHERE component = ? AND resource = ? ORDER BY id DESC LIMIT 1",
+                (component, resource)
+            ).fetchone()
+            
+            if not last_run:
+                return []
+            
+            # 2. Get 168h forecast for that specific run
             rows = conn.execute(
                 """SELECT target_timestamp, predicted_value, model_name
                    FROM ml_predictions
-                   WHERE component = ? AND resource = ? AND is_best = 1
-                   ORDER BY target_timestamp ASC""",
-                (component, resource)
+                   WHERE component = ? AND resource = ? AND is_best = 1 AND run_id = ?
+                   ORDER BY target_timestamp ASC LIMIT 168""",
+                (component, resource, last_run['run_id'])
             ).fetchall()
         return [dict(row) for row in rows]
 
